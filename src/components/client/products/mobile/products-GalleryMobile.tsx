@@ -28,9 +28,7 @@ export default function ProductGalleryMobile({ media }: Props) {
   const dragStartX = useRef<number | null>(null);
 
   const router = useRouter();
-  const { 
-    cart, 
-  } = useCart();
+  const { cart } = useCart();
 
   const totalItemsCount = cart?.totalItems || 0;
 
@@ -46,10 +44,10 @@ export default function ProductGalleryMobile({ media }: Props) {
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!wrapperRef.current || dragStartX.current === null) return;
     const deltaX = e.touches[0].clientX - dragStartX.current;
-    
+
     // Sử dụng CSS variable thay cho trực tiếp style.transform
     wrapperRef.current.style.setProperty(
-      '--translate-x', 
+      "--translate-x",
       `calc(${-currentIndex * 100}% + ${deltaX}px)`
     );
   };
@@ -57,9 +55,9 @@ export default function ProductGalleryMobile({ media }: Props) {
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!wrapperRef.current || dragStartX.current === null) return;
     const deltaX = e.changedTouches[0].clientX - dragStartX.current;
-    
+
     // Thêm lại transition khi touch kết thúc
-    wrapperRef.current.classList.add(styles.galleryWrapper);
+    // wrapperRef.current.classList.add(styles.galleryWrapper);
     wrapperRef.current.classList.remove(styles.galleryWrapperNoTransition);
 
     if (deltaX < -40 && currentIndex < media.length - 1) {
@@ -68,7 +66,10 @@ export default function ProductGalleryMobile({ media }: Props) {
       setCurrentIndex((prev) => prev - 1);
     } else {
       // Reset về vị trí hiện tại nếu không thay đổi slide
-      wrapperRef.current.style.setProperty('--translate-x', `-${currentIndex * 100}%`);
+      wrapperRef.current.style.setProperty(
+        "--translate-x",
+        `-${currentIndex * 100}%`
+      );
     }
 
     dragStartX.current = null;
@@ -133,7 +134,12 @@ export default function ProductGalleryMobile({ media }: Props) {
   // Sử dụng custom CSS module và CSS variables
   useEffect(() => {
     if (wrapperRef.current) {
-      wrapperRef.current.style.setProperty('--translate-x', `-${currentIndex * 100}%`);
+      // luôn có transition khi đổi slide
+      wrapperRef.current.classList.add(styles.galleryWrapper);
+      wrapperRef.current.style.setProperty(
+        "--translate-x",
+        `-${currentIndex * 100}%`
+      );
     }
   }, [currentIndex]);
 
@@ -195,7 +201,7 @@ export default function ProductGalleryMobile({ media }: Props) {
           variant="ghost"
           size="icon"
           className="bg-black/50 text-white hover:bg-black/70 w-9 h-9 p-0 rounded-full"
-          onClick={() => router.push('/')}
+          onClick={() => router.push("/")}
         >
           <ChevronLeft className="w-5 h-5" />
         </Button>
@@ -205,7 +211,7 @@ export default function ProductGalleryMobile({ media }: Props) {
               variant="ghost"
               size="icon"
               className="bg-black/50 text-white hover:bg-black/70 w-9 h-9 p-0 rounded-full"
-              onClick={() => router.push('/cart')}
+              onClick={() => router.push("/cart")}
             >
               <ShoppingCart className="w-5 h-5" />
             </Button>

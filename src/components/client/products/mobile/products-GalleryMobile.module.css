@@ -7,4 +7,5 @@
 
 .galleryWrapperNoTransition {
   transition: none;
+  transform: translateX(var(--translate-x, 0)); /* 👈 giữ nguyên */
 }

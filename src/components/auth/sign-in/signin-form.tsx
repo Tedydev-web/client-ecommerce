@@ -21,6 +21,7 @@ import { OAuthForm } from '../layout/OAuthForm'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { Button } from '@/components/ui/button'
 
 export function SigninForm({ className, ...props }: React.ComponentPropsWithoutRef<'form'>) {
   const { handleSignin, loading } = useSignin()
@@ -41,8 +42,6 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
   const [showPassword, setShowPassword] = useState(false)
 
   const onSubmit = async (values: z.infer<typeof Schema>) => {
-    // Create a copy of the values and remove rememberMe before submitting
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { rememberMe, ...submissionValues } = values
     await handleSignin(submissionValues)
   }
@@ -51,31 +50,35 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('flex flex-col gap-6', className)}
+        className={cn("flex flex-col gap-6", className)}
         {...props}
       >
         <AnimatedForm>
           {/* Tiêu đề */}
           <AnimatedFormItem>
             <div className="flex flex-col items-center gap-2 text-center">
-              <h1 className="text-4xl font-bold">{t('auth.login.title')}</h1>
+              <h1 className="text-4xl font-bold">{t("auth.login.title")}</h1>
               <p className="text-balance text-md text-muted-foreground">
-                {t('auth.login.subtitle')}
+                {t("auth.login.subtitle")}
               </p>
             </div>
           </AnimatedFormItem>
 
           {/* Form */}
-          <div className="grid gap-6">            
+          <div className="grid gap-6">
             <AnimatedFormItem>
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('auth.common.email')}</FormLabel>
+                    <FormLabel>{t("auth.common.email")}</FormLabel>
                     <FormControl>
-                      <Input {...field} type="text" placeholder={t('auth.login.placeholder')} />
+                      <Input
+                        {...field}
+                        type="text"
+                        placeholder={t("auth.login.placeholder")}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -90,19 +93,19 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
-                      <FormLabel>{t('auth.common.password')}</FormLabel>
+                      <FormLabel>{t("auth.common.password")}</FormLabel>
                       <Link
                         href="/verify-email?action=forgot"
                         className="text-sm text-primary hover:underline underline-offset-4"
                       >
-                        {t('auth.login.forgot password')}
+                        {t("auth.login.forgot password")}
                       </Link>
                     </div>
                     <FormControl>
                       <div className="relative">
                         <Input
                           {...field}
-                          type={showPassword ? 'text' : 'password'}
+                          type={showPassword ? "text" : "password"}
                           placeholder="******"
                         />
                         <button
@@ -138,7 +141,7 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel className="text-sm font-normal">
-                        {t('auth.login.remember me')}
+                        {t("auth.login.remember me")}
                       </FormLabel>
                     </div>
                   </FormItem>
@@ -152,7 +155,7 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
               className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={loading}
             >
-              {loading ? t('auth.login.logging in...') : t('auth.login.login')}
+              {loading ? t("auth.login.logging in...") : t("auth.login.login")}
             </AnimatedButton>
 
             {/* OAuth Form */}
@@ -161,12 +164,12 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
             {/* Link đến đăng ký */}
             <AnimatedFormItem>
               <div className="text-center text-sm">
-                {t('auth.login.no account')}{' '}
+                {t("auth.login.no account")}{" "}
                 <Link
                   href="/verify-email?action=signup"
                   className="underline underline-offset-4 text-primary hover:text-primary/90"
                 >
-                  {t('auth.login.register')}
+                  {t("auth.login.register")}
                 </Link>
               </div>
             </AnimatedFormItem>
@@ -174,5 +177,5 @@ export function SigninForm({ className, ...props }: React.ComponentPropsWithoutR
         </AnimatedForm>
       </form>
     </Form>
-  )
+  );
 }

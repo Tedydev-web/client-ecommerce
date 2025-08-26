@@ -40,6 +40,7 @@ export function OAuthForm({ className, type = 'signin' }: OAuthFormProps) {
       </AnimatedFormItem>
 
       <AnimatedButton
+        type='button'
         variant='outline'
         className='w-full hover:border-primary hover:text-primary mt-3'
         onClick={handleGoogleAuth}

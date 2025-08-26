@@ -61,67 +61,58 @@ export const OrderTabs = ({ counts }: { counts: Record<string, number> }) => {
 
   return (
     <div className="relative w-full">
-      <div
-        ref={scrollRef}
-        className="w-full overflow-x-auto scrollbar-hide lg:overflow-x-hidden"
-      >
-        <TabsList
-          className="flex w-max min-w-full
-            bg-white overflow-x-auto scrollbar-hide
-            border-b border-gray-200
-            px-1 md:px-2 py-0.5 sm:py-2 
-            h-10 sm:h-11 gap-0 md:gap-2 pt-2"
-        >
+      <div ref={scrollRef} className="w-full overflow-x-auto scrollbar-hide">
+        <TabsList className="flex w-max min-w-full bg-white border-b h-12 gap-1 p-1">
           {tabValues.map((tab) => (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="relative flex-shrink-0 whitespace-nowrap 
-         text-[11px] sm:text-xs md:text-sm font-medium text-muted-foreground 
-         px-2 sm:px-3 py-1.5 sm:py-2 text-center 
-         bg-transparent border-none shadow-none rounded-md md:rounded-none
-         hover:bg-gray-50 md:hover:bg-transparent
-         focus:outline-none focus:ring-0 focus-visible:ring-0 
-         data-[state=active]:text-[#d70018] 
-         data-[state=active]:after:content-[''] 
-         data-[state=active]:after:absolute 
-         data-[state=active]:after:inset-x-0 
-         data-[state=active]:after:-bottom-0.5 sm:data-[state=active]:after:-bottom-1
-         data-[state=active]:after:-right-0
-         data-[state=active]:after:h-[2px] sm:data-[state=active]:after:h-[3px] 
-         data-[state=active]:shadow-none
-         data-[state=active]:after:bg-[#d70018] 
-         md:flex-1"
+              className="
+                relative flex-shrink-0 whitespace-nowrap
+                text-xs font-medium text-gray-600
+                px-3 py-2 rounded-md
+                hover:bg-gray-50 hover:text-gray-800
+                data-[state=active]:bg-[#D70018]/10 
+                data-[state=active]:text-[#D70018]
+                data-[state=active]:font-semibold
+                transition-all duration-200
+                flex items-center gap-2
+              "
             >
-              {tab.label}
+              <span>{tab.label}</span>
 
-              {/* Badge overlay */}
+              {/* Count badge - Hình tròn đẹp */}
               {tab.count > 0 && (
-                <span
-                  className="absolute -top-1.5 -right-2 
-                 bg-[#d70018] text-white text-[10px] sm:text-[11px] 
-                 px-1.5 py-0.5 rounded-full leading-none
-                 min-w-[18px] text-center"
+                <div
+                  className="
+                  w-5 h-5 rounded-full
+                  bg-gradient-to-r from-[#D70018] to-[#FF4444]
+                  text-white text-[10px] font-bold
+                  flex items-center justify-center
+                  shadow-md
+                  data-[state=active]:from-white data-[state=active]:to-white 
+                  data-[state=active]:text-[#D70018]
+                  transition-all duration-200
+                "
                 >
-                  {tab.count}
-                </span>
+                  {tab.count > 99 ? "99+" : tab.count}
+                </div>
               )}
             </TabsTrigger>
           ))}
         </TabsList>
       </div>
 
-      {/* Left Arrow */}
+      {/* Navigation arrows */}
       {showLeftArrow && (
-        <div className="absolute left-0 top-0 h-full w-8 sm:w-10 flex items-center justify-start pointer-events-none md:hidden bg-gradient-to-r from-white to-transparent">
-          <ChevronLeft className="text-gray-400 w-4 h-4 sm:w-5 sm:h-5 ml-1" />
+        <div className="absolute left-0 top-0 h-full w-8 flex items-center bg-gradient-to-r from-white to-transparent md:hidden">
+          <ChevronLeft className="text-gray-400 w-4 h-4" />
         </div>
       )}
 
-      {/* Right Arrow */}
       {showRightArrow && (
-        <div className="absolute right-0 top-0 h-full w-8 sm:w-10 flex items-center justify-end pointer-events-none md:hidden bg-gradient-to-l from-white to-transparent">
-          <ChevronRight className="text-gray-400 w-4 h-4 sm:w-5 sm:h-5 mr-1" />
+        <div className="absolute right-0 top-0 h-full w-8 flex items-center justify-end bg-gradient-to-l from-white to-transparent md:hidden">
+          <ChevronRight className="text-gray-400 w-4 h-4" />
         </div>
       )}
     </div>
