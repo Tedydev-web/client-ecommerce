@@ -45,7 +45,7 @@
     "@radix-ui/react-tooltip": "^1.2.6",
     "@reduxjs/toolkit": "^2.8.1",
     "@tanstack/query-sync-storage-persister": "^5.83.0",
-    "@tanstack/react-query": "^5.83.0",
+    "@tanstack/react-query": "^5.85.5",
     "@tanstack/react-query-persist-client": "^5.83.0",
     "@tanstack/react-table": "^8.21.3",
     "@tiptap/extension-image": "^2.5.7",

@@ -365,18 +365,6 @@ export default function DesktopCartPageMobile() {
                    />
                  );
                })}
-              
-              {/* Voucher Button */}
-              {/* <div className="p-3 border-t">
-                <VoucherButton 
-                  shopId={shopCart.shop.id} 
-                  shopName={shopCart.shop.name} 
-                  onApplyVoucher={(voucher: any) => { // You can replace 'any' with a specific Voucher type if available
-                    console.log("Applied voucher:", voucher);
-                    // Xử lý logic áp dụng voucher ở đây
-                  }}
-                />
-              </div> */}
             </div>
           ))}
         </>

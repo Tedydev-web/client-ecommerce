@@ -13,9 +13,10 @@ import {
 export const cartService = {
   /**
    * Lấy thông tin giỏ hàng của người dùng hiện tại
+   * @param params Query parameters (có thể bao gồm limit, page, etc.)
    * @returns Promise với thông tin giỏ hàng
    */
-  getCart: async (params?: string): Promise<CartResponse> => {
+  getCart: async (params?: { limit?: number; page?: number; [key: string]: any }): Promise<CartResponse> => {
     try {
       const response = await privateAxios.get(API_ENDPOINTS.CART.GET_CART, { params });
       return response.data;

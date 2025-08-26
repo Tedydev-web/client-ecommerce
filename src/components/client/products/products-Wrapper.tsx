@@ -27,6 +27,24 @@ export default function ProductPageWrapper({ slug, initialData, error: serverErr
   const [autoRetryEnabled, setAutoRetryEnabled] = useState(!!serverError);
   const router = useRouter();
 
+  // Gọi API 1 lần để cập nhật stock khi component mount
+  useEffect(() => {
+    if (initialData) {
+      const refreshProductData = async () => {
+        try {
+          const productId = extractProductId(slug);
+          const freshData = await clientProductsService.getProductDetail(productId);
+          setData(freshData);
+        } catch (err) {
+          console.error('Error refreshing product data:', err);
+          // Không set error để không ảnh hưởng UI
+        }
+      };
+
+      refreshProductData();
+    }
+  }, [slug, initialData]);
+
   // Auto-retry mechanism mỗi 8 giây khi có lỗi
   useEffect(() => {
     if (!error || !autoRetryEnabled) return;

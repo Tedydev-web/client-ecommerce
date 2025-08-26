@@ -63,7 +63,11 @@ export const useCart = (options: UseCartOptions = { autoFetch: false }) => {
 
     try {
       setIsLoading(true);
-      const response = await cartService.getCart(params);
+      // Tạo params object với limit 200 để hiển thị tất cả items trong cart
+      const queryParams = params ? JSON.parse(params) : {};
+      const finalParams = { limit: 500, ...queryParams };
+      
+      const response = await cartService.getCart(finalParams);
       
       if (response.data && Array.isArray(response.data)) {
         setShopCarts(response.data as ShopCart[]);
