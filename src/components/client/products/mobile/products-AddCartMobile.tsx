@@ -13,29 +13,21 @@ import {
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
+  Sku,
+  VariantGroup,
+  SelectedVariants,
   findMatchingSku, 
   areAllVariantsSelected, 
   getCurrentStock, 
   isOptionAvailable,
-  Sku,
-  VariantGroup,
-  SelectedVariants,
   handleAddToCart
-} from "@/components/client/products/shared/productUtils";
+} from "@/utils/productUtils";
 import { useCart } from '@/providers/CartContext';
 import { useAuthGuard } from '@/hooks/useAuthGuard';
-
-interface VariantValue {
-  optionType: string;
-  value: string;
-}
-
-interface VariantOption {
-  value: string;
-}
+import { useRouter } from 'next/navigation';
 
 interface Product {
-  id: string;
+  id?: string; // Optional để tương thích với InfoMobile
   name: string;
   basePrice: number;
   virtualPrice: number;
@@ -48,24 +40,30 @@ interface AddCartMobileProps {
   product: Product;
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  isBuyNowMode?: boolean; // Thêm prop để xác định mode
 }
 
-export default function AddCartMobile({ product, isOpen, onOpenChange }: AddCartMobileProps) {
-  const [selectedVariants, setSelectedVariants] = useState<Record<string, string | null>>({});
+export default function AddCartMobile({ product, isOpen, onOpenChange, isBuyNowMode = false }: AddCartMobileProps) {
+  const [selectedVariants, setSelectedVariants] = useState<SelectedVariants>({});
   const [currentSku, setCurrentSku] = useState<Sku | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const { addToCart } = useCart();
-  const { withAuth } = useAuthGuard();
+  const { checkAuth } = useAuthGuard();
+  const router = useRouter();
   
   // Lấy ra tất cả variants từ API response
   const variantGroups = product.variants || [];
   
-  // Tạo một object để theo dõi các lựa chọn variant của người dùng
+  // Auto-select variants khi component mount
   useEffect(() => {
     const initialVariants: SelectedVariants = {};
     variantGroups.forEach(group => {
-      initialVariants[group.value] = null;
+      if (group.value === "Default" && group.options.includes("Default")) {
+        initialVariants[group.value] = "Default";
+      } else {
+        initialVariants[group.value] = null;
+      }
     });
     setSelectedVariants(initialVariants);
   }, [variantGroups]);
@@ -85,7 +83,7 @@ export default function AddCartMobile({ product, isOpen, onOpenChange }: AddCart
   // Tìm SKU phù hợp với các lựa chọn variant hiện tại và cập nhật state
   useEffect(() => {
     // Sử dụng hàm tiện ích để tìm SKU phù hợp
-    const matchingSku = findMatchingSku(selectedVariants, product.skus, variantGroups as VariantGroup[]);
+    const matchingSku = findMatchingSku(selectedVariants, product.skus, variantGroups);
     
     if (matchingSku) {
       console.log('Tìm thấy SKU:', matchingSku);
@@ -97,7 +95,7 @@ export default function AddCartMobile({ product, isOpen, onOpenChange }: AddCart
   }, [selectedVariants, product.skus, variantGroups]);
   
   // Tính toán tổng tồn kho dựa trên SKU hiện tại hoặc sử dụng hàm tiện ích
-  const totalStock = getCurrentStock(selectedVariants, product.skus, variantGroups as VariantGroup[]);
+  const totalStock = getCurrentStock(selectedVariants, product.skus, variantGroups);
   
   // Kiểm tra xem đã chọn đủ variants chưa
   const isVariantSelected = areAllVariantsSelected(selectedVariants);
@@ -116,26 +114,37 @@ export default function AddCartMobile({ product, isOpen, onOpenChange }: AddCart
     });
   };
   
-  const handleAddToCartClick = withAuth(async () => {
-    if (!isVariantSelected || !currentSku || currentSku.stock === 0) return;
+  const handleAddToCartClick = async () => {
+    if (checkAuth()) {
+      if (!isVariantSelected || !currentSku || currentSku.stock === 0) return;
 
-    setIsAddingToCart(true);
-    try {
-      await handleAddToCart(
-        selectedVariants,
-        product.skus,
-        variantGroups as VariantGroup[],
-        quantity,
-        addToCart
-      );
-      // Optionally close the drawer after adding to cart
-      if (onOpenChange) {
-        onOpenChange(false);
+      setIsAddingToCart(true);
+      try {
+        await handleAddToCart(
+          selectedVariants,
+          product.skus,
+          variantGroups,
+          quantity,
+          addToCart
+        );
+        
+        // Đóng drawer
+        if (onOpenChange) {
+          onOpenChange(false);
+        }
+        
+        // Nếu là buy now mode, redirect tới cart
+        if (isBuyNowMode) {
+          router.push('/cart');
+        }
+      } finally {
+        setIsAddingToCart(false);
       }
-    } finally {
-      setIsAddingToCart(false);
+    } else {
+      // Có thể redirect tới trang đăng nhập hoặc show modal login
+      console.log('User not authenticated');
     }
-  });
+  };
   
   // Lấy hình ảnh sản phẩm
   const productImage = product.media?.[0]?.src || '/images/image-placeholder.jpg';
@@ -278,10 +287,15 @@ export default function AddCartMobile({ product, isOpen, onOpenChange }: AddCart
           {/* Nút thêm vào giỏ hàng */}
           <Button
             className="w-full h-12 bg-red-600 hover:bg-red-700 text-white font-medium text-base rounded-md"
-            disabled={!isVariantSelected || !currentSku || currentSku.stock === 0}
+            disabled={!isVariantSelected || !currentSku || currentSku.stock === 0 || isAddingToCart}
             onClick={handleAddToCartClick}
           >
-            THÊM VÀO GIỎ HÀNG
+            {isAddingToCart 
+              ? "ĐANG THÊM..." 
+              : isBuyNowMode 
+                ? "THÊM VÀO GIỎ & MUA NGAY" 
+                : "THÊM VÀO GIỎ HÀNG"
+            }
           </Button>
         </div>
       </DrawerContent>

@@ -18,7 +18,11 @@ interface Product {
     name: string;
   };
   series?: string;
-  sku?: string;
+  skus?: {
+    id: string;
+    value: string;
+    stock: number;
+  }[];
   material?: string;
   origin?: string;
   warrantyType?: string;
@@ -26,6 +30,10 @@ interface Product {
   stock?: number;
   shipFrom?: string;
   name?: string;
+  specifications?: {
+    name: string;
+    value: string;
+  }[];
 }
 
 export default function ProductSpecsMobile({ product }: { product: Product }) {
@@ -61,14 +69,23 @@ export default function ProductSpecsMobile({ product }: { product: Product }) {
         
         <SpecRowMobile label="Thương hiệu" value={product.brand?.name} />
         <SpecRowMobile label="Dòng sản phẩm" value={product.series ?? product.name} />
-        <SpecRowMobile label="SKU" value={product.sku} />
+        {/* <SpecRowMobile label="SKU" value={product.sku} />
         <SpecRowMobile label="Chất liệu" value={product.material} />
         <SpecRowMobile label="Xuất xứ" value={product.origin} />
         <SpecRowMobile label="Loại bảo hành" value={product.warrantyType} />
         <SpecRowMobile label="Thời gian bảo hành" value={product.warrantyTime} />
         <SpecRowMobile label="Kho hàng" value={product.stock?.toString()} />
         <SpecRowMobile label="Gửi từ" value={product.shipFrom} />
-        <SpecRowMobile label="Trọng lượng" value={product.weight} />
+        <SpecRowMobile label="Trọng lượng" value={product.weight} /> */}
+        
+        {/* Dynamic specifications */}
+        {product.specifications?.map((specification) => (
+          <SpecRowMobile
+            key={specification.name}
+            label={specification.name}
+            value={specification.value}
+          />
+        ))}
       </div>
       
       {/* Mô tả sản phẩm */}

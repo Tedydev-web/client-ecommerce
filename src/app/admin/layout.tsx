@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { Sidebar } from '@/components/admin/layout/Sidebar'
 import { Header } from '@/components/admin/layout/Header'
-import { AdminRouteGuard } from '@/components/auth/AdminRouteGuard'
 import { cn } from '@/lib/utils'
 import { useResponsive } from '@/hooks/useResponsive'
 
@@ -25,7 +24,6 @@ export default function AdminLayout({
   }
 
   return (
-    <AdminRouteGuard>
       <div className="relative min-h-screen bg-background">
         <Header onToggleSidebar={handleToggleSidebar} />
         <Sidebar isOpen={sidebarOpen} onOpenChange={setSidebarOpen} onCollapse={handleSidebarCollapse}/>
@@ -46,6 +44,5 @@ export default function AdminLayout({
           </main>
         </div>
       </div>
-    </AdminRouteGuard>
   )
 }

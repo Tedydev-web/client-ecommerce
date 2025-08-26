@@ -19,6 +19,7 @@ export default function ProductsFooter({
   onChat 
 }: ProductsFooterProps) {
   const [isAddCartOpen, setIsAddCartOpen] = useState(false);
+  const [isBuyNowMode, setIsBuyNowMode] = useState(false);
   
   const handleAddToCart = (skuId: string, quantity: number) => {
     if (onAddToCart) {
@@ -26,6 +27,16 @@ export default function ProductsFooter({
     }
     // Đóng drawer sau khi thêm vào giỏ hàng
     setIsAddCartOpen(false);
+  };
+
+  const handleAddToCartClick = () => {
+    setIsBuyNowMode(false); // Normal add to cart mode
+    setIsAddCartOpen(true);
+  };
+
+  const handleBuyNowClick = () => {
+    setIsBuyNowMode(true); // Buy now mode
+    setIsAddCartOpen(true);
   };
 
   return (
@@ -44,7 +55,7 @@ export default function ProductsFooter({
 
         {/* Thêm vào giỏ hàng */}
         <button
-          onClick={() => setIsAddCartOpen(true)}
+          onClick={handleAddToCartClick}
           className="flex-1 h-10 w-24 rounded-none border-none text-red-600 hover:bg-red-50 text-base flex items-center justify-center gap-2 transition-all"
         >
           <ShoppingCart className="w-5 h-5" />
@@ -52,7 +63,7 @@ export default function ProductsFooter({
 
         {/* Mua ngay */}
         <button
-          onClick={onBuyNow}
+          onClick={handleBuyNowClick}
           className="flex-1 h-10 rounded-none border-none bg-red-600 hover:bg-red-700 text-white font-medium text-base flex items-center justify-center transition-all"
         >
           Mua ngay
@@ -65,6 +76,7 @@ export default function ProductsFooter({
           product={product}
           isOpen={isAddCartOpen}
           onOpenChange={setIsAddCartOpen}
+          isBuyNowMode={isBuyNowMode}
           // onAddToCart={handleAddToCart}
         />
       )}

@@ -1,107 +1,73 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { PROTECTED_ROUTES, PUBLIC_ROUTES, ROUTES } from "@/constants/route";
-import { useAuthGuard } from "@/hooks/useAuthGuard";
-import { Spinner } from "@/components/ui/spinner";
-import { showToast } from "@/components/ui/toastify";
+import { useUserData } from '@/hooks/useGetData-UserLogin';
+
+// Routes cần đăng nhập
+const PROTECTED_ROUTES = ['/admin', '/cart', '/user'];
+
+// Admin-only routes cho SELLER không được truy cập
+const ADMIN_ONLY_ROUTES = [
+  '/admin/permissions',
+  '/admin/roles', 
+  '/admin/users',
+  '/admin/audit-logs',
+  '/admin/languages',
+  '/admin/device',
+  '/admin/brand',
+  '/admin/categories',
+  '/admin/system'
+];
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { 
-    isAuthenticated, 
-    isLoading, 
-    userData, 
-    checkRouteAccess, 
-    getHomeRedirectByRole 
-  } = useAuthGuard();
-
-  const [hasShownAccessDeniedToast, setHasShownAccessDeniedToast] = useState(false);
-
-  // Kiểm tra xem route hiện tại có cần bảo vệ không
-  const isProtectedRoute = PROTECTED_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(route)
-  );
-
-  // Kiểm tra xem có phải route public không
-  const isPublicRoute = PUBLIC_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(route)
-  );
+  const userData = useUserData();
+  
+  const isAuthenticated = !!userData;
 
   useEffect(() => {
-    if (!isLoading) {
-      // Reset toast flag when route changes
-      setHasShownAccessDeniedToast(false);
-      
-      // Nếu chưa đăng nhập và đang ở protected route
-      if (!isAuthenticated && isProtectedRoute) {
-        router.push(ROUTES.AUTH.SIGNIN);
+    const userRole = userData?.role?.name || '';
+    
+    // Kiểm tra routes cần đăng nhập
+    const needsAuth = PROTECTED_ROUTES.some(route => pathname.startsWith(route));
+    
+    if (needsAuth && !isAuthenticated) {
+      router.replace('/sign-in');
+      return;
+    }
+
+    // Kiểm tra quyền truy cập admin cho CLIENT
+    if (isAuthenticated && pathname.startsWith('/admin')) {
+      if (userRole === 'CLIENT') {
+        router.replace('/not-found');
         return;
       }
-
-      // Nếu đã đăng nhập, kiểm tra quyền truy cập route
-      if (isAuthenticated && userData) {
-        const userRole = userData.role?.name || '';
-        const routeAccess = checkRouteAccess(pathname);
+      
+      // Kiểm tra admin-only routes cho SELLER
+      if (userRole === 'SELLER') {
+        const isAdminOnlyRoute = ADMIN_ONLY_ROUTES.some(route => 
+          pathname === route || pathname.startsWith(route)
+        );
         
-        // Kiểm tra quyền truy cập admin routes
-        if (routeAccess.isAdminRoute && !routeAccess.canAccessAdminRoute(userRole)) {
-          console.log(`Access denied: User role "${userRole}" cannot access admin route: ${pathname}`);
-          
-          // Show toast notification only once per route change
-          if (!hasShownAccessDeniedToast) {
-            showToast(
-              `Bạn không có quyền truy cập vào trang quản trị. Role hiện tại: ${userRole}`, 
-              'error'
-            );
-            setHasShownAccessDeniedToast(true);
-          }
-          
-          // Redirect về trang chính phù hợp với role
-          const homeRoute = getHomeRedirectByRole(userRole);
-          router.push(homeRoute);
+        if (isAdminOnlyRoute) {
+          router.replace('/not-found');
           return;
         }
       }
+    }
 
-      // Nếu đã đăng nhập và đang ở signin/signup page
-      if (
-        isAuthenticated &&
-        (pathname === ROUTES.AUTH.SIGNIN || pathname === ROUTES.AUTH.SIGNUP)
-      ) {
-        const userRole = userData?.role?.name || '';
-        const homeRoute = getHomeRedirectByRole(userRole);
-        router.push(homeRoute);
+    // Redirect nếu đã đăng nhập và đang ở trang auth
+    if (isAuthenticated && (pathname === '/sign-in' || pathname === '/sign-up')) {
+      if (userRole === 'CLIENT') {
+        router.replace('/');
+      } else {
+        router.replace('/admin');
       }
     }
-  }, [isAuthenticated, isLoading, isProtectedRoute, pathname, userData, checkRouteAccess, getHomeRedirectByRole, hasShownAccessDeniedToast]);
+  }, [isAuthenticated, pathname, userData, router]);
 
-  // Show loading khi đang kiểm tra auth ở protected route
-  if (isLoading && isProtectedRoute) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Spinner />
-      </div>
-    );
-  }
-
-  // Không render gì nếu chưa auth và đang ở protected route
-  if (!isAuthenticated && isProtectedRoute) {
-    return null;
-  }
-
-  // Kiểm tra quyền truy cập route nếu đã authenticated
-  if (isAuthenticated && userData) {
-    const userRole = userData.role?.name || '';
-    const routeAccess = checkRouteAccess(pathname);
-    
-    // Nếu không có quyền truy cập admin route thì không render
-    if (routeAccess.isAdminRoute && !routeAccess.canAccessAdminRoute(userRole)) {
-      return null;
-    }
-  }
-
+  // Render children trực tiếp để tránh chunk errors
   return <>{children}</>;
 }
