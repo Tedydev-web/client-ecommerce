@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react';
 import { productsService } from '@/services/productsService';
+import { clientProductsService } from '@/services/clientProductsService'
 import { ProductDetail } from '@/types/products.interface';
+import { ClientProductDetail } from '@/types/client.products.interface';
 
 export const useCartAction = () => {
-  const [productDetails, setProductDetails] = useState<ProductDetail | null>(null);
+  const [productDetails, setProductDetails] = useState<ClientProductDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -11,7 +13,7 @@ export const useCartAction = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const details = await productsService.getById(productId);
+      const details = await clientProductsService.getProductDetail(productId);
       setProductDetails(details);
     } catch (err) {
       console.error('Failed to fetch product details:', err);

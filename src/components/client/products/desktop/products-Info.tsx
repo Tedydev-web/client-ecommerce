@@ -28,7 +28,7 @@ import {
   areAllVariantsSelected,
   findSelectedSkuPrice,
   handleAddToCart
-} from "../shared/productUtils";
+} from "@/utils/productUtils";
 import { useRouter } from "next/navigation";
 
 interface Product {
@@ -129,6 +129,19 @@ export default function ProductInfo({ product }: { product: Product }) {
 
   // Kiểm tra xem đã chọn đủ variants chưa
   const isVariantSelected = areAllVariantsSelected(selectedVariants);
+
+  // Debug log để hiểu các điều kiện
+  useEffect(() => {
+    console.log('=== PRODUCT DEBUG INFO ===');
+    console.log('Product SKUs:', product.skus);
+    console.log('Variant Groups:', variantGroups);
+    console.log('Selected Variants:', selectedVariants);
+    console.log('Current SKU:', currentSku);
+    console.log('Is Variant Selected:', isVariantSelected);
+    console.log('Current Stock:', currentSku?.stock || 0);
+    console.log('Can Add to Cart:', isVariantSelected && currentSku && currentSku.stock > 0);
+    console.log('=========================');
+  }, [selectedVariants, currentSku, isVariantSelected, product.skus, variantGroups]);
 
   // Xử lý input số lượng
   const handleQuantityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -338,7 +351,8 @@ export default function ProductInfo({ product }: { product: Product }) {
               variantGroup.value,
               option,
               selectedVariants,
-              product.skus
+              product.skus,
+              variantGroups as VariantGroup[]
             );
 
             return (

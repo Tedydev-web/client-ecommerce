@@ -86,12 +86,30 @@ export const SELLER_ALLOWED_ROUTES = [
   '/admin/voucher'
 ] as const;
 
-// Định nghĩa các route cần bảo vệ
-export const PROTECTED_ROUTES = [
+// Tất cả admin routes (ADMIN + SELLER)
+export const ALL_ADMIN_ROUTES = [
+  ...ADMIN_ONLY_ROUTES,
+  ...SELLER_ALLOWED_ROUTES
+] as const;
+
+// Routes cần authentication nhưng không phân biệt role
+export const AUTH_REQUIRED_ROUTES = [
   '/cart',
   '/checkout',
-  '/user',
-  '/admin'
+  '/user'
+] as const;
+
+// Định nghĩa các route cần bảo vệ (bao gồm cả admin và user routes)
+export const PROTECTED_ROUTES = [
+  ...AUTH_REQUIRED_ROUTES,
+  '/admin' // Tất cả admin routes đều cần protection
+] as const;
+
+// Routes chỉ dành cho CLIENT (không được truy cập admin)
+export const CLIENT_ONLY_ROUTES = [
+  '/cart',
+  '/checkout',
+  '/user'
 ] as const;
 
 // Định nghĩa các route public (không cần auth)

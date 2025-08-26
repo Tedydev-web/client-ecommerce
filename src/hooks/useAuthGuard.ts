@@ -67,17 +67,28 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
     const canAccessAdminRoute = (userRole: string) => {
       if (!isAdminRoute) return true; // Không phải admin route thì OK
       
-      // ADMIN có thể truy cập tất cả
-      if (userRole === 'ADMIN') return true;
+      // Normalize role name
+      const normalizedRole = userRole?.toUpperCase?.() || '';
       
-      // SELLER chỉ được truy cập routes được phép
-      if (userRole === 'SELLER') {
-        return SELLER_ALLOWED_ROUTES.some(route => 
-          pathname === route || pathname.startsWith(route)
-        );
+      console.log(`Checking admin route access: User role "${normalizedRole}", Route: "${pathname}"`);
+      
+      // ADMIN có thể truy cập tất cả admin routes
+      if (normalizedRole === 'ADMIN') {
+        console.log('✅ Admin access granted');
+        return true;
       }
       
-      // CLIENT không được truy cập admin routes
+      // SELLER chỉ được truy cập routes được phép
+      if (normalizedRole === 'SELLER') {
+        const canAccess = SELLER_ALLOWED_ROUTES.some(route => 
+          pathname === route || pathname.startsWith(route)
+        );
+        console.log(`${canAccess ? '✅' : '❌'} Seller access ${canAccess ? 'granted' : 'denied'}`);
+        return canAccess;
+      }
+      
+      // CLIENT, CUSTOMER và các role khác không được truy cập admin routes
+      console.log(`❌ Access denied for role "${normalizedRole}" to admin routes`);
       return false;
     };
 
@@ -91,13 +102,19 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}) => {
 
   // Lấy redirect URL dựa trên role
   const getHomeRedirectByRole = useCallback((userRole: string) => {
-    switch (userRole?.toUpperCase()) {
+    const normalizedRole = userRole?.toUpperCase?.() || '';
+    
+    console.log(`Getting home redirect for role: "${normalizedRole}"`);
+    
+    switch (normalizedRole) {
       case 'ADMIN':
       case 'SELLER':
+        console.log('Redirecting to admin dashboard');
         return '/admin';
       case 'CLIENT':
       case 'CUSTOMER':
       default:
+        console.log('Redirecting to home page');
         return '/';
     }
   }, []);
