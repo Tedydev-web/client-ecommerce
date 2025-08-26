@@ -122,7 +122,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
           </span>
         </span>
       </Link>
-      
+
       <section className="bg-white rounded-lg border p-4 space-y-3">
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Tiến trình đơn hàng</h2>
@@ -140,9 +140,11 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
         />
       </section>
 
-      <section className="bg-white rounded-lg border p-4 space-y-3">
-        <OrderInfo orderCode={order.orderCode} />
-      </section>
+      {order.status !== "CANCELLED" && (
+        <section className="bg-white rounded-lg border p-4 space-y-3">
+          <OrderInfo orderCode={order.orderCode} />
+        </section>
+      )}
 
       {/* Tổng quan */}
       <section className="bg-white rounded-lg border p-4 space-y-3">
