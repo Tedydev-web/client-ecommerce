@@ -58,7 +58,7 @@ export default function SearchSidebar({ categoryIds = [], currentCategoryId }: S
         isLoading={loadingSubcategories}
       />
       <Separator className="my-4" />
-      <CheckboxFilterSection 
+      {/* <CheckboxFilterSection 
         title="Nơi Bán" 
         icon={<MapPin className="h-4 w-4" />}
         items={locations} 
@@ -66,7 +66,7 @@ export default function SearchSidebar({ categoryIds = [], currentCategoryId }: S
         onCheckChange={(item, checked) => handleCheckboxChange('locations', item, checked)}
       />
       <Separator className="my-4" />
-      <CheckboxFilterSection 
+      <CheckboxFilterSection    
         title="Thương Hiệu" 
         icon={<Store className="h-4 w-4" />}
         items={brands}
@@ -92,7 +92,7 @@ export default function SearchSidebar({ categoryIds = [], currentCategoryId }: S
           <X className="h-3.5 w-3.5 mr-1.5" />
           Xóa tất cả
         </Button>
-      </div>
+      </div> */}
     </aside>
   );
 }

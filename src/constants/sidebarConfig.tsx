@@ -117,11 +117,11 @@ export const useSidebarConfig = (): SidebarItem[] => {
           href: '/admin/users',
           icon: null,
         },
-        {
-          title: t('system.systemLog'),
-          href: '/admin/audit-logs',
-          icon: null,
-        },
+        // {
+        //   title: t('system.systemLog'),
+        //   href: '/admin/audit-logs',
+        //   icon: null,
+        // },
       ],
     },  
     {
@@ -134,11 +134,11 @@ export const useSidebarConfig = (): SidebarItem[] => {
           href: '/admin/languages',
           icon: null,
         },
-        {
-          title: t('device.deviceManager'),
-          href: '/admin/device',
-          icon: null,
-        },
+        // {
+        //   title: t('device.deviceManager'),
+        //   href: '/admin/device',
+        //   icon: null,
+        // },
         {
           title: t('brand.brandManager'),
           href: '/admin/brand',

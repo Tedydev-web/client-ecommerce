@@ -207,10 +207,8 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
                   Mua lại
                 </Button>
               )}
-
               {/* Nút Thanh toán lại - chỉ hiển thị cho trạng thái PENDING_PAYMENT */}
-              {/* {(order.status === "PENDING_PAYMENT" ||
-                order.status === "PENDING_PACKAGING") && (
+              {order.status === "PENDING_PAYMENT" && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -222,7 +220,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
                 >
                   Tiếp tục thanh toán
                 </Button>
-              )} */}
+              )}
 
               {/* Nút Hủy đơn hàng - chỉ hiển thị cho trạng thái PENDING_PAYMENT */}
               {(order.status === "PENDING_PAYMENT" ||

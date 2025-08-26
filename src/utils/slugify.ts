@@ -1,7 +1,6 @@
 // utils/slugify.ts
 
 import { url } from "inspector";
-import URLHashUtils from "./hash";
 import { ENUM } from "@/configs/common";
 
 // Hàm slugify ban đầu (giữ nguyên)
@@ -22,7 +21,7 @@ export function isCategorySlug(slug: string): boolean {
   return slug.includes('-cat.');
 }
 
-// Cập nhật hàm tạo slug để hỗ trợ nhiều cấp danh mục
+// Cập nhật hàm tạo slug để hỗ trợ nhiều cấp danh mục (không hash)
 export function createCategorySlug(name: string, ids: string[] | string | null | undefined) {
   // Tạo tên URL-friendly nhưng vẫn giữ nguyên chữ viết hoa và dấu
   const urlFriendlyName = name
@@ -32,21 +31,20 @@ export function createCategorySlug(name: string, ids: string[] | string | null |
   // Đảm bảo ids là mảng
   const idsArray = Array.isArray(ids) ? ids : (ids ? [ids] : []);
   
-  // Tạo phần ID với format cat.ID1.ID2...
+  // Tạo phần ID với format cat.ID1.ID2... (không hash)
   const idPart = idsArray.length > 0 ? `cat.${idsArray.join('.')}` : '';
-  const urlHashUtils = new URLHashUtils(ENUM.VINCENTKEY);
   
-  // Tạo slug theo format: /Tên-cat.Id1.Id2...
-  return `/${urlFriendlyName}-${urlHashUtils.encryptId(idPart)}`;
+  // Tạo slug theo format: /Tên-cat.Id1.Id2... (ID thật, không hash)
+  return `/${urlFriendlyName}-${idPart}`;
 }
 
-// Cập nhật hàm trích xuất ID để trả về mảng các ID
+// Cập nhật hàm trích xuất ID để trả về mảng các ID (không hash)
 export function extractCategoryIds(slug: string): string[] {
   // Tìm kiếm pattern "-cat." và lấy tất cả các ID sau nó
   const matches = slug.match(/-cat\.([^/]+)$/);
   if (!matches || !matches[1]) return [];
   
-  // Phân tách các ID bằng dấu chấm
+  // Phân tách các ID bằng dấu chấm (ID thật, không cần decrypt)
   return matches[1].split('.');
 }
 

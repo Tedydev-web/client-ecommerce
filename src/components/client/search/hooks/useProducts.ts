@@ -9,7 +9,6 @@ import {
 import { clientProductsService } from "@/services/clientProductsService";
 import { useServerDataTable } from "@/hooks/useServerDataTable";
 import { PaginationRequest } from "@/types/base.interface";
-import URLHashUtils from "@/utils/hash";
 import {ENUM} from "@/configs/common";
 
 // Định nghĩa interface cho pagination để tránh lỗi undefined
@@ -65,7 +64,7 @@ export function useProducts({
 
   // Lấy thông tin phân trang từ URL parameters
   const initialPage = Number(searchParams.get("page") || 1);
-  const initialLimit = Number(searchParams.get("limit") || 20);
+  const initialLimit = Number(searchParams.get("limit") || 20); 
 
   // Sử dụng refs để theo dõi giá trị trước đó
   const prevCategoryIdRef = useRef<string | null | undefined>(categoryId);
@@ -85,55 +84,34 @@ export function useProducts({
     {
       fetchData: async (params: PaginationRequest, signal?: AbortSignal) => {
         // Thêm các params đặc biệt
-        // console.log("Fetching products with params:", params);
+        console.log("Fetching products with params:", params);
         const apiParams: any = { ...params };
 
-        // Nếu có từ khóa tìm kiếm, ưu tiên API search và bỏ qua category filter
-        const urlHashUtils = new URLHashUtils(ENUM.VINCENTKEY);
-        if (categoryId) {
-          // Chỉ áp dụng filter theo category khi không có search query
-          apiParams.categoryId = urlHashUtils.decryptId(categoryId);
-        }
-        // if (searchQuery) {
-        //   // Xóa category param nếu đang tìm kiếm để đảm bảo tìm kiếm trên toàn bộ sản phẩm
-        //   delete apiParams.categoryId;
-        // } 
-
-        // Nếu có từ khóa tìm kiếm, sử dụng API search
-        // if (searchQuery) {
-          apiParams.q = searchQuery; // Sử dụng param 'q' thay vì 'search' cho API search
-
+        // Logic phân biệt giữa category filter và search
+        if (searchQuery && searchQuery.trim()) {
+          // CÓ SEARCH QUERY -> Sử dụng Search API
+          console.log("Using SEARCH API for query:", searchQuery);
+          
+          apiParams.q = searchQuery;
+          
           // LUÔN sử dụng đúng timestamp từ URL để đảm bảo request khớp với URL hiện tại
           const urlTimestamp = searchParams.get("_t");
           if (urlTimestamp) {
             apiParams._t = urlTimestamp;
           }
 
-          // Thêm log để debug nguồn gốc của request
-          // console.log("Searching products with params:", {
-          //   q: searchQuery,
-          //   timestamp: apiParams._t,
-          //   source: "useProducts.hook",
-          //   ...apiParams,
-          // });
-
-          console.log("Using search API with params:", apiParams);
-
-          const searchResponse = await clientProductsService.searchProducts(
-            {
-              search: searchQuery,
-              ...apiParams
-            }
-          );
+          const searchResponse = await clientProductsService.searchProducts({
+            search: searchQuery,
+            ...apiParams
+          });
 
           // Chuyển đổi dữ liệu từ search API sang định dạng tương thích với ClientProduct
-          // console.log("Raw search response:", searchResponse);
           const convertedData = searchResponse.data.map((item) => ({ 
             id: item.productId,
             name: item.productName,
             description: item.productDescription || "",
             basePrice: item.skuPrice || 0,
-            virtualPrice: item.skuPrice || 0, // Có thể cần thêm logic xử lý giá ảo
+            virtualPrice: item.skuPrice || 0,
             brandId: item.brandId || "",
             images: item.productImages || [],
             variants: item.variants || [],
@@ -141,12 +119,10 @@ export function useProducts({
             publishedAt: item.createdAt,
             createdAt: item.createdAt,
             updatedAt: item.updatedAt,
-            // Thêm các trường bắt buộc từ BaseEntity
-            createdById: 0, // Default value
+            createdById: 0,
             updatedById: null,
             deletedById: null,
             deletedAt: null,
-            // Thêm các trường cần thiết khác
             isPublished: true,
             brandName: item.brandName || "",
             categories:
@@ -154,12 +130,11 @@ export function useProducts({
                 id,
                 name: item.categoryNames?.[index] || "",
               })) || [],
-          })) as unknown as ClientProduct[]; // Sử dụng unknown làm trung gian
+          })) as unknown as ClientProduct[];
 
-          console.log("Search response received:", {
+          console.log("Search API response:", {
             itemCount: convertedData.length,
             metadata: searchResponse.metadata,
-            data: convertedData,
           });
 
           setProd(convertedData);
@@ -167,12 +142,31 @@ export function useProducts({
           return searchResponse.success && {
             statusCode: searchResponse.statusCode,
             message: searchResponse.message,
-            products:  convertedData,
+            products: convertedData,
             metadata: searchResponse.metadata,
           };
-        // }
+        } else {
+          // KHÔNG CÓ SEARCH QUERY -> Sử dụng Products API
+          console.log("Using PRODUCTS API");
+          
+          if (categoryId) {
+            // Có categoryId từ URL slug có -cat.
+            apiParams.categories = categoryId;
+            console.log("Filtering by categories:", categoryId);
+          }
 
-        // return await clientProductsService.getProducts(apiParams);
+          // Gọi Products API thay vì Search API
+          const productsResponse = await clientProductsService.getProducts(apiParams);
+          
+          console.log("Products API response:", {
+            itemCount: productsResponse.data?.length || 0,
+            metadata: productsResponse.metadata,
+          });
+
+          setProd(productsResponse.data || []);
+
+          return productsResponse;
+        }
       },
       getResponseData: (response: any) => response.data || [],
       getResponseMetadata: (response: any) => response.metadata,

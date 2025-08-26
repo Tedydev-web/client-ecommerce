@@ -32,7 +32,7 @@ export default function SearchDesktopIndex({ categoryIds = [], currentCategoryId
             currentCategoryId={currentCategoryId} 
           />
           <div className="flex-1 space-y-4">
-            <ShopSuggestion />
+            {/* <ShopSuggestion /> */}
             {keyword && (
               <div className="text-sm text-gray-500">
                 Kết quả tìm kiếm cho từ khoá '{keyword}'
