@@ -62,20 +62,35 @@ export function QrSepay({ paymentId, orderId, totalAmount, onPaymentConfirm, onP
     if (payments.length === 0) return;
 
     const latestPayment = payments[payments.length - 1];
+    
+    // Debug logging để kiểm tra data
+    console.log('🔍 [WebSocket] Latest payment received:', latestPayment);
+    console.log('🔍 [WebSocket] Current paymentId:', paymentId);
+    console.log('🔍 [WebSocket] Current orderId:', orderId);
 
-    // Check if the latest payment is a success for the current order via Sepay
+    // Check if the latest payment is a success for the current payment via Sepay
+    // Sepay response có format: { status: "success", gateway: "sepay", paymentId: 105 }
     if (
       latestPayment &&
-      latestPayment.orderId === orderId &&
+      (latestPayment.paymentId?.toString() === paymentId?.toString() || 
+       latestPayment.orderId === orderId) && // fallback check
       latestPayment.status === 'success' &&
       latestPayment.gateway === 'sepay'
     ) {
+      console.log('✅ [WebSocket] Payment success matched!');
       toast.success('Thanh toán thành công!');
       console.clear();
       // Redirect to the success page
       router.push(`/checkout/payment-success?orderId=${orderId}&totalAmount=${finalTotalAmount}`);
+    } else {
+      // Debug tại sao không match
+      console.log('❌ [WebSocket] Payment not matched:');
+      console.log('- PaymentId match:', latestPayment?.paymentId?.toString() === paymentId?.toString());
+      console.log('- OrderId match:', latestPayment?.orderId === orderId);
+      console.log('- Status match:', latestPayment?.status === 'success');
+      console.log('- Gateway match:', latestPayment?.gateway === 'sepay');
     }
-  }, [payments, orderId, router, finalTotalAmount]);
+  }, [payments, paymentId, orderId, router, finalTotalAmount]);
 
   // Countdown timer
   useEffect(() => {
@@ -126,7 +141,7 @@ export function QrSepay({ paymentId, orderId, totalAmount, onPaymentConfirm, onP
       toast.loading('Đang kiểm tra thanh toán...');
       const Order = await orderService.getById(orderId);
       
-      if (Order.data.status === OrderStatus.PICKUPED) {
+      if (Order.data.status === OrderStatus.PICKUPED || OrderStatus.PENDING_PACKAGING || OrderStatus.VERIFY_PAYMENT) {
         toast.dismiss();
         toast.success('Thanh toán thành công!');
         router.push(`/checkout/payment-success?orderId=${orderId}&totalAmount=${finalTotalAmount}`);

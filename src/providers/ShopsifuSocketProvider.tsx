@@ -55,14 +55,19 @@ export const ShopsifuSocketProvider = ({ children }: { children: ReactNode }) =>
 
     // Listen event 'payment' như backend emit
     newSocket.on('payment', (data: PaymentData) => {
-      // console.log('Received payment event:', data)
+      console.log('📨 [WebSocket] Received payment event:', data)
       setPayments((prevPayments) => [...prevPayments, data])
     })
 
     // Listen event 'receive-money' từ PaymentGateway
     newSocket.on('receive-money', (data: PaymentData) => {
-      // console.log('Received money event:', data)
+      console.log('💰 [WebSocket] Received money event:', data)
       setPayments((prevPayments) => [...prevPayments, data])
+    })
+
+    // Listen for any other payment-related events
+    newSocket.onAny((eventName, ...args) => {
+      console.log(`🔔 [WebSocket] Received event "${eventName}":`, args)
     })
     
     newSocket.on('connect_error', (err) => {
