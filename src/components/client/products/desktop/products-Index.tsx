@@ -141,7 +141,7 @@ export default function ProductDetail({ slug, product: productData, isLoading = 
       </div>
       <div className="max-w-[1200px] mx-auto mt-6 rounded space-y-6">
         {/* ✅ Thông tin Shop */}
-        <div>
+        {/* <div>
           <ProductShopInfo shop={{
             id: "cool-crew-12345",
             name: "Cool Crew",
@@ -155,7 +155,7 @@ export default function ProductDetail({ slug, product: productData, isLoading = 
             joinedDate: "9 tháng trước",
             productsCount: 86
           }} />
-        </div>
+        </div> */}
 
         {/* ✅ Thông số kỹ thuật */}
         <div>
