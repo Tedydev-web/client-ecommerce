@@ -181,8 +181,8 @@ export default function DashboardOrders() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-xs text-gray-500">Đơn hàng:</span>
-                        <span className="text-xs font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">
-                          #{order.paymentId}
+                        <span className="text-xs font-bold px-2 py-0.5 rounded">
+                          #{order.id}
                         </span>
                       </div>
                       <div className="text-xs text-gray-500">
@@ -244,7 +244,7 @@ export default function DashboardOrders() {
                       <div className="text-sm text-gray-600">
                         Đơn hàng:{" "}
                         <span className="font-bold text-gray-800 bg-gray-100 px-2 py-1 rounded-md">
-                          #{order.paymentId}
+                          #{order.id}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
