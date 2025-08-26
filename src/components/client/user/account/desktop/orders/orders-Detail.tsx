@@ -129,7 +129,7 @@ export default function OrderDetail({ orderId }: OrderDetailProps) {
           <span className="text-sm font-medium">
             {order.status === "DELIVERED"
               ? `Đơn hàng đã hoàn thành: ${order.orderCode}`
-              : `Mã đơn hàng: ${order.orderCode}`}
+              : `Mã vận đơn: ${order.orderCode}`}
           </span>
         </div>
         <OrderTimeline

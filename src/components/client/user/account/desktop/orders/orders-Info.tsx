@@ -50,7 +50,7 @@ const OrderInfo: React.FC<OrderInfoProps> = ({ orderCode }) => {
   if (!orderInfo) {
     return (
       <p className="text-center text-gray-500">
-        Không tìm thấy thông tin đơn hàng.
+        Không tìm thấy thông tin vận đơn.
       </p>
     );
   }
