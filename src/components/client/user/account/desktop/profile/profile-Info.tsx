@@ -66,6 +66,7 @@ export default function ProfileInfo() {
       name: userData?.name || "",
       phoneNumber: userData?.phoneNumber || "",
       avatar: userData?.avatar || "",
+      email: userData?.email || "",
       // gender: userData.gender || "",
       // dob: userData.dob || "",
       address: formattedAddress,
@@ -158,7 +159,7 @@ export default function ProfileInfo() {
             [
               ["name", "Họ và tên"],
               ["gender", "Giới tính"],
-              ["dob", "Ngày sinh"],
+              // ["dob", "Ngày sinh"],
               ["phoneNumber", "Số điện thoại"],
               ["email", "Email"],
               ["address", "Địa chỉ mặc định"],
@@ -172,13 +173,14 @@ export default function ProfileInfo() {
                 <FormItem>
                   <FormLabel className="text-sm">{label}</FormLabel>
                   <FormControl>
-                    {name === "dob" ? (
+                    {/* {name === "dob" ? (
                       <Input
                         type="date"
                         {...field}
                         className="w-full h-12 text-[15px] px-4"
                       />
-                    ) : name === "gender" ? (
+                    ) :  */}
+                    {name === "gender" ? (
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -202,7 +204,7 @@ export default function ProfileInfo() {
                     ) : (
                       <Input
                         {...field}
-                        disabled={["phoneNumber", "email"].includes(name)}
+                        disabled={["email"].includes(name)}
                         className="w-full h-12 text-[15px] px-4"
                       />
                     )}
