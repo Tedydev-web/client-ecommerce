@@ -23,22 +23,6 @@ export function Header() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Loading state với animation
-  // if (isLoading) {
-  //   return (
-  //     <div className="fixed top-0 left-0 right-0 z-50 h-[60px] bg-gradient-to-r from-red-700 via-red-600 to-red-700">
-  //       <motion.div 
-  //         className="h-full flex items-center justify-center"
-  //         initial={{ opacity: 0 }}
-  //         animate={{ opacity: 1 }}
-  //         transition={{ duration: 0.3 }}
-  //       >
-  //         <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
-  //       </motion.div>
-  //     </div>
-  //   );
-  // }
-
   // Hydration mismatch prevention
   if (!isMounted) {
     return (

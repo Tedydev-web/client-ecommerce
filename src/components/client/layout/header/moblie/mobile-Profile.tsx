@@ -45,7 +45,13 @@ export function ProfileDropdown() {
     {
       icon: User,
       label: 'Tài khoản của tôi',
-      onClick: () => router.push(ROUTES.CLIENT.USER.BASE)
+      onClick: () => router.push(ROUTES.CLIENT.USER.DASHBOARD)
+    },
+    {
+      icon: ShoppingCart,
+      label: 'Giỏ hàng của bạn',
+      onClick: () => router.push(ROUTES.CLIENT.CART),
+      requireDivider: true
     },
     {
       icon: ShoppingCart,

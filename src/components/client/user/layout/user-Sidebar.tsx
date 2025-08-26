@@ -19,7 +19,7 @@ export function Sidebar() {
 
   useEffect(() => {
     // Only redirect on desktop from /user to /user/profile
-    if (!isMobileView && pathname === '/user') {
+    if (!isMobileView && pathname === '/user/dashboard') {
       router.push('/user/dashboard');
     }
   }, [isMobileView, router, pathname]);

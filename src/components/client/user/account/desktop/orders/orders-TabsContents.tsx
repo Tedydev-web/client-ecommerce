@@ -7,64 +7,28 @@ import { useOrder } from "./useOrder";
 import { OrderStatus } from "@/types/order.interface";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ArrowRight } from "lucide-react";
 import { createProductSlug } from "@/components/client/products/shared/productSlug";
 import { ReviewsModal } from "@/components/client/products/products-ReviewsModal";
-import {
-  ShoppingCart,
-  Truck,
-  TicketPercent,
-  Wallet,
-  ArrowRight,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
-interface StatusInfo {
-  label: string;
-  className: string;
-}
-
-const statusLabel: Record<OrderStatus, StatusInfo> = {
+const statusConfig = {
   PENDING_PAYMENT: {
     label: "Chờ thanh toán",
-    className:
-      "bg-gradient-to-r from-amber-50 to-yellow-100 text-amber-700 border border-amber-200",
+    bg: "bg-amber-100 text-amber-700",
   },
   PENDING_PACKAGING: {
     label: "Đang đóng gói",
-    className:
-      "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-700 border border-orange-200",
+    bg: "bg-orange-100 text-orange-700",
   },
-  PICKUPED: {
-    label: "Chờ lấy hàng",
-    className:
-      "bg-gradient-to-r from-sky-50 to-blue-100 text-sky-700 border border-sky-200",
-  },
+  PICKUPED: { label: "Chờ lấy hàng", bg: "bg-blue-100 text-blue-700" },
   PENDING_DELIVERY: {
     label: "Đang giao hàng",
-    className:
-      "bg-gradient-to-r from-violet-50 to-purple-100 text-violet-700 border border-violet-200",
+    bg: "bg-purple-100 text-purple-700",
   },
-  DELIVERED: {
-    label: "Đã giao hàng",
-    className:
-      "bg-gradient-to-r from-emerald-50 to-green-100 text-emerald-700 border border-emerald-200",
-  },
-  RETURNED: {
-    label: "Đã trả hàng",
-    className:
-      "bg-gradient-to-r from-slate-50 to-gray-100 text-slate-700 border border-slate-200",
-  },
-  CANCELLED: {
-    label: "Đã hủy",
-    className:
-      "bg-gradient-to-r from-red-50 to-rose-100 text-red-700 border border-red-200",
-  },
-  VERIFY_PAYMENT: {
-    label: "Đã xác nhận thanh toán",
-    className:
-      "bg-gradient-to-r from-emerald-50 to-green-100 text-emerald-700 border border-emerald-200",
-  },
+  DELIVERED: { label: "Đã giao hàng", bg: "bg-green-100 text-green-700" },
+  RETURNED: { label: "Đã trả hàng", bg: "bg-gray-100 text-gray-700" },
+  CANCELLED: { label: "Đã hủy", bg: "bg-red-100 text-red-700" },
+  VERIFY_PAYMENT: { label: "Đã xác nhận", bg: "bg-green-100 text-green-700" },
 };
 
 interface Props {
@@ -83,15 +47,7 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
     fetchOrdersByStatus,
   } = useOrder();
   const [visibleCount, setVisibleCount] = useState(6);
-  const [fetchedAll, setFetchedAll] = useState(false);
-
-  // state mở modal review
-  const [reviewProduct, setReviewProduct] = useState<{
-    productId: string;
-    productName: string;
-    productSlug: string;
-    orderId: string;
-  } | null>(null);
+  const [reviewProduct, setReviewProduct] = useState<any>(null);
 
   useEffect(() => {
     if (!currentTab) onTabChange("all");
@@ -106,7 +62,6 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
     setVisibleCount(6);
   }, [currentTab, fetchAllOrders, fetchOrdersByStatus]);
 
-  // OrderTabContent.tsx
   const handleViewDetail = (orderId: string) => {
     router.push(
       `/user/orders/${orderId}?code=${
@@ -116,7 +71,6 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
   };
 
   const tabs = ["all", ...Object.values(OrderStatus)];
-  const displayedOrders = orders.slice(0, visibleCount);
 
   return (
     <>
@@ -124,113 +78,118 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
         <TabsContent
           key={value}
           value={value}
-          className="
-            bg-white rounded-none shadow-none
-            min-h-[70vh] px-2 pb-2
-            md:rounded-xl md:shadow-sm md:min-h-[85vh]
-            transition-all
-          "
+          className="bg-white min-h-[70vh] p-4"
         >
           {value !== currentTab ? null : loading ? (
-            <div className="h-full flex items-center justify-center text-muted-foreground text-sm sm:text-base">
-              Đang tải đơn hàng...
+            <div className="h-full flex items-center justify-center">
+              <div className="text-center">
+                <div className="animate-spin w-8 h-8 border-2 border-[#D70018] border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-gray-600">Đang tải đơn hàng...</p>
+              </div>
             </div>
           ) : error ? (
-            <div className="h-full flex items-center justify-center text-destructive text-sm sm:text-base">
-              {error}
+            <div className="h-full flex items-center justify-center text-red-500">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  ❌
+                </div>
+                <p>{error}</p>
+              </div>
             </div>
           ) : orders.length ? (
             <div className="space-y-3">
-              {displayedOrders.map((order) => {
+              {orders.slice(0, visibleCount).map((order) => {
                 const firstItem = order.items[0];
-                const totalAmount = order.totalPayment;
+                const status = statusConfig[order.status] || {
+                  label: order.status,
+                  bg: "bg-gray-100",
+                };
 
                 return (
                   <div
                     key={order.id}
-                    className="group border rounded-lg p-3 sm:p-4 bg-white hover:border-[#D70018]/30 hover:shadow-lg transition-all duration-300 cursor-pointer
-                               text-xs sm:text-sm transition-all duration-200 hover:from-[#D70018]/5 hover:to-[#FF6B35]/5"
+                    className="border rounded-lg p-4 hover:shadow-md hover:border-[#D70018]/30 transition-all cursor-pointer"
                     onClick={() => handleViewDetail(order.id)}
                   >
-                    <div className="flex justify-between items-center gap-4">
-                      {/* Left: Image + Info */}
-                      <div className="flex gap-3 items-center flex-1 min-w-0">
-                        <div className="relative group-hover:scale-105 transition-transform duration-200 flex-shrink-0">
-                          <img
-                            src={firstItem?.image || "/static/no-image.png"}
-                            alt={firstItem?.productName || "Sản phẩm"}
-                            className="w-12 h-12 sm:w-[60px] sm:h-[60px] object-cover rounded-lg shadow-sm border border-gray-100"
-                          />
-                          <div className="absolute inset-0 rounded-lg bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-                        </div>
-                        <div className="text-left flex-1 min-w-0">
-                          <h4 className="text-sm font-bold text-gray-800 truncate mb-1 group-hover:text-[#D70018] transition-colors duration-200">
-                            {firstItem?.productName}
-                          </h4>
-                          <p className="text-xs text-gray-500 truncate">
-                            Đơn hàng:{" "}
-                            <span className="font-semibold">{order.id}</span>
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-3 pb-2 border-b">
+                      <span className="text-sm text-gray-600">
+                        Mã: <strong>{order.id}</strong>
+                      </span>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${status.bg}`}
+                      >
+                        {status.label}
+                      </span>
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex gap-3">
+                      {/* Image */}
+                      <div className="relative">
+                        <img
+                          src={firstItem?.image || "/static/no-image.png"}
+                          alt={firstItem?.productName}
+                          className="w-16 h-16 object-cover rounded-lg border"
+                        />
+                        {order.items.length > 1 && (
+                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#D70018] text-white text-xs font-bold rounded-full flex items-center justify-center">
+                            {order.items.length}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-gray-800 mb-1 line-clamp-2">
+                          {firstItem?.productName}
+                        </h4>
+                        {order.items.length > 1 && (
+                          <p className="text-xs text-gray-500 mb-2">
+                            và {order.items.length - 1} sản phẩm khác
                           </p>
-                          <p className="text-xs text-gray-500">
+                        )}
+                        <div className="text-xs text-gray-500 space-y-1">
+                          <p>
                             Ngày đặt:{" "}
                             {new Date(order.createdAt).toLocaleDateString(
                               "vi-VN"
                             )}
                           </p>
+                          <p>
+                            SL:{" "}
+                            {order.items.reduce(
+                              (sum, item) => sum + item.quantity,
+                              0
+                            )}{" "}
+                            sản phẩm
+                          </p>
                         </div>
                       </div>
 
-                      {/* Right: Status + Price + Actions */}
-                      <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                        <div className="text-gray-400 text-xs sm:text-sm">
-                          <span
-                            className={`text-xs font-semibold px-3 py-2 rounded-full ${
-                              statusLabel[order.status]?.className ||
-                              "bg-gray-100 text-gray-600 border border-gray-200"
-                            }`}
-                          >
-                            {statusLabel[order.status]?.label || order.status}
-                          </span>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-xs text-gray-500 mb-1">
-                            Tổng thanh toán
-                          </p>
-                          <p className="text-base font-bold text-[#D70018] bg-gradient-to-r from-[#D70018] to-[#FF6B35] bg-clip-text text-transparent">
-                            {totalAmount.toLocaleString()}đ
+                      {/* Price & Actions */}
+                      <div className="text-right">
+                        <div className="mb-3">
+                          <p className="text-xs text-gray-500">Tổng tiền</p>
+                          <p className="font-bold text-[#D70018] text-lg">
+                            {order.totalPayment.toLocaleString()}₫
                           </p>
                         </div>
-                        <div className="inline-flex items-center text-sm text-[#D70018] font-semibold hover:text-[#B8001A] transition-colors duration-200 group/link">
-                          Xem chi tiết
-                          <svg
-                            className="w-4 h-4 ml-1 group-hover/link:translate-x-1 transition-transform duration-200"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M17 8l4 4m0 0l-4 4m4-4H3"
-                            />
-                          </svg>
-                        </div>
+
                         {order.status === "DELIVERED" && (
                           <Button
-                            variant="outline"
                             size="sm"
-                            className="text-orange-500 border-orange-500 hover:bg-orange-50"
+                            variant="outline"
+                            className="text-xs mb-2"
                             onClick={(e) => {
                               e.stopPropagation();
-                              const productSlug = createProductSlug(
-                                firstItem.productName,
-                                firstItem.productId
-                              );
                               setReviewProduct({
                                 productId: firstItem.productId,
                                 productName: firstItem.productName,
-                                productSlug,
+                                productSlug: createProductSlug(
+                                  firstItem.productName,
+                                  firstItem.productId
+                                ),
                                 orderId: order.id,
                               });
                             }}
@@ -238,18 +197,22 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                             Đánh giá
                           </Button>
                         )}
+
+                        <div className="flex items-center gap-1 text-xs text-[#D70018] font-medium">
+                          Chi tiết <ArrowRight className="w-3 h-3" />
+                        </div>
                       </div>
                     </div>
                   </div>
                 );
               })}
 
+              {/* Load more */}
               {metadata?.totalItems && visibleCount < metadata.totalItems && (
-                <div className="flex justify-center mt-4">
+                <div className="text-center mt-6">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     onClick={async () => {
-                      // 🔹 Nếu chưa load hết thì gọi API với limit = totalItems
                       if (orders.length < (metadata?.totalItems ?? 0)) {
                         if (currentTab === "all") {
                           await fetchAllOrders(1, metadata.totalItems);
@@ -261,13 +224,11 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
                           );
                         }
                       }
-                      // 🔹 Sau đó hiển thị thêm
                       setVisibleCount((prev) => prev + 10);
                     }}
-                    className="text-xs sm:text-sm md:text-base text-[#3B82F6]"
+                    className="text-[#D70018] border-[#D70018]/30 hover:bg-[#D70018] hover:text-white"
                   >
-                    Xem thêm
-                    <ChevronDown className="ml-1 w-4 h-4" />
+                    Xem thêm <ChevronDown className="w-4 h-4 ml-1" />
                   </Button>
                 </div>
               )}
@@ -278,7 +239,6 @@ export const OrderTabContent = ({ currentTab, onTabChange }: Props) => {
         </TabsContent>
       ))}
 
-      {/* Review Modal */}
       {reviewProduct && (
         <ReviewsModal
           open={!!reviewProduct}
